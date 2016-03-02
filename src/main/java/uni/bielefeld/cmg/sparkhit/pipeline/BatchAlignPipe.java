@@ -257,10 +257,12 @@ public class BatchAlignPipe implements Serializable{
                 eValue = Arithmetic.getEValue(pAlign.bestScore, param.minor, param.lambda, eReadLength, eRefLength);
                 if (eValue > param.eValue){continue;}
                 trys = 0;
+                String formatEValue = String.format("%.2e", eValue);
+                String formatIdentity = String.format("%.2f", readIdentityDouble);
 
-                outputLine += rInfo.readName + "\t" + rInfo.readSize + "nt\t" + eValue + "\t"
+                outputLine += rInfo.readName + "\t" + rInfo.readSize + "nt\t" + formatEValue + "\t"
                         + readCoverage + "\t" + (pAlign.fromFirst + 1) + "\t" + (pAlign.endFirst + 1)
-                        + "\t+\t" + readIdentityDouble + "\t" + listTitle.get(qGram.chr).name
+                        + "\t+\t" + formatIdentity + "\t" + listTitle.get(qGram.chr).name
                         + "\t" + (qGram.begin + pAlign.fromSecond + 1) + "\t" + (qGram.begin+ pAlign.endSecond + 1) + "\n";
 
             } // end of foreach qGram
@@ -344,9 +346,12 @@ public class BatchAlignPipe implements Serializable{
                 eValue = Arithmetic.getEValue(pAlign.bestScore, param.minor, param.lambda, eReadLength, eRefLength);
                 if (eValue > param.eValue){continue;}
                 trys = 0;
-                outputLine += rInfo.readName + "\t" + rInfo.readSize + "nt\t" + eValue + "\t"
+                String formatEValue = String.format("%.2e", eValue);
+                String formatIdentity = String.format("%.2f", readIdentityDouble);
+
+                outputLine += rInfo.readName + "\t" + rInfo.readSize + "nt\t" + formatEValue + "\t"
                         + readCoverage + "\t" + (pAlign.fromFirst + 1) + "\t" + (pAlign.endFirst + 1)
-                        + "\t-\t" + readIdentityDouble + "\t" + listTitle.get(qGram.chr).name
+                        + "\t-\t" + formatIdentity + "\t" + listTitle.get(qGram.chr).name
                         + "\t" + (qGram.begin + pAlign.fromSecond + 1) + "\t" + (qGram.begin+ pAlign.endSecond + 1) + "\n";
             } // end of qGram loop
         } // end of negative strand

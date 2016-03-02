@@ -117,9 +117,9 @@ public class RefStructSerializer implements RefSerializer {
         String met = param.inputFaPath + ".met";
 
         kSerializer.kryoSerialization(ref.BBList, bbl, 0);
-        kSerializer.kryoSerialization(ref.block, blo, 1);
-        kSerializer.kryoSerialization(ref.title, tit, 2);
-        kSerializer.kryoSerialization(ref.index, ind, 3);
+        kSerializer.kryoSerialization(ref.block, blo, 0);
+        kSerializer.kryoSerialization(ref.title, tit, 0);
+        kSerializer.kryoSerialization(ref.index, ind, 1);
         putMetaData(met);
 
     }
