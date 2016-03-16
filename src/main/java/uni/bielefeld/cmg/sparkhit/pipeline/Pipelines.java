@@ -161,6 +161,25 @@ public class Pipelines implements Pipeline {
             processors[i].join();
         }
 
+        /**
+         *  looping each entry of a tar file
+         */
+        if (inputFileBuffer.fileFormatIntMark == 3 || inputFileBuffer.fileFormatIntMark == 4) {
+            while (inputFileBuffer.setNextTarArchiveEntry()) {
+                inputBufferedReader = inputFileBuffer.getBufferReader();  // re-initial bufferReader to next tar entry
+                inputFastqUnitBuffer = new FastqUnitBuffer(inputBufferedReader);  // re-initial FastqUnitBuffer
+
+                for (int i = 0; i < cores; i++) {
+                    threadName = "processor P" + i;
+                    newThread(i);
+                }
+
+                for (int i = 0; i < cores; i++) {
+                    processors[i].join();
+                }
+            }
+        }
+
         try {
             outputBufferedWriter.close();
         } catch (IOException e) {

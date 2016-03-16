@@ -134,7 +134,7 @@ public class ReadFastq implements InputFileManager {
         }
 
         else if (cFile.startsWith("hdfs")) {
-            info.readMessage("Input fastq file is lacated in HDFS : ");
+            info.readMessage("Input fastq file is located in HDFS : ");
             info.screenDump();
             info.readMessage("\t" + cFile);
             info.screenDump();
@@ -153,6 +153,16 @@ public class ReadFastq implements InputFileManager {
                 info.readMessage("However, it is not there, please check it again");
                 info.screenDump();
                 System.exit(0);
+            } else if (cFile.endsWith("gz")) {
+                info.readMessage("Reading fastq file using BufferedReader");
+                info.screenDump();
+                info.readMessage("Uncompress gz file using GzipCompressor");
+                info.screenDump();
+            } else if (cFile.endsWith("bz2")) {
+                info.readMessage("Reading fastq file using BufferedReader");
+                info.screenDump();
+                info.readMessage("Uncompress bz2 file using BZip2Compressor");
+                info.screenDump();
             }else {
                 info.readMessage("Reading fastq file using BufferedReader");
                 info.screenDump();
