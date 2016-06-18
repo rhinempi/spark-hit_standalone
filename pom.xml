@@ -6,7 +6,7 @@
 
     <groupId>cmg</groupId>
     <artifactId>SparkHit</artifactId>
-    <version>0.2-STANDALONE</version>
+    <version>0.3-STANDALONE</version>
     <dependencies>
         <dependency>
             <groupId>commons-cli</groupId>

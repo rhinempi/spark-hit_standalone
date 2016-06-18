@@ -83,19 +83,33 @@ public class OnePipe implements Pipeline,Runnable {
     }
 
     public void run(){
-        try {
-            BatchAlignPipe batchPipeline = new BatchAlignPipe();
-            batchPipeline.setParam(param);
-            batchPipeline.setStruct(ref);
-            batchPipeline.setMatrix(matrix);
-            while ((read = inputBufferedFastqUnit.nextUnit()) != null) {
-                String outputM = batchPipeline.recruit(read);
-                outputBufferedWriter.write(outputM);
+        if (param.readIdentity < 95) {
+            try {
+                BatchAlignPipe batchPipeline = new BatchAlignPipe();
+                batchPipeline.setParam(param);
+                batchPipeline.setStruct(ref);
+                batchPipeline.setMatrix(matrix);
+                while ((read = inputBufferedFastqUnit.nextUnit()) != null) {
+                    String outputM = batchPipeline.recruit(read);
+                    outputBufferedWriter.write(outputM);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e){
-            e.printStackTrace();
+        } else{
+            try {
+                BatchAlignPipeFast fastBatchPipeline = new BatchAlignPipeFast();
+                fastBatchPipeline.setParam(param);
+                fastBatchPipeline.setStruct(ref);
+                fastBatchPipeline.setMatrix(matrix);
+                while ((read = inputBufferedFastqUnit.nextUnit()) != null) {
+                    String outputM = fastBatchPipeline.recruit(read);
+                    outputBufferedWriter.write(outputM);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void setInputFastqUnitBuffer(FastqUnitBuffer inputBufferedFastqUnit){

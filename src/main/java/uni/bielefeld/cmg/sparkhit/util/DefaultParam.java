@@ -57,8 +57,9 @@ public class DefaultParam implements Serializable{
     public  Pattern invalidNt = Pattern.compile("[NXacgt]");        // invalid Nucleotides
     public  Pattern validNtNomask = Pattern.compile("[ACGTacgt]");  // for some genomes lower case char are not repeat areas
     public  Pattern nxNomask = Pattern.compile("[NX]");             // only mask NX
+    public  int bestPigeon = 10;            // 100bp with 5 mismatch, according to pigeon hole principle
     public  int bestKmers = 20;             // 4-mers q-gram filter part, Number of minimum qGrams
-    public  int bestNas = 24;               // bps 80%
+    public  int bestNas = 24;               // bps 80% of 30 coverage
     public  int maxTrys = 20;               // tries for alignment
     public  int skipThreshold = 1000;       // threshold for long reads with 2bp skip per extension
     public  int globalSignal = 0;           //
@@ -118,6 +119,7 @@ public class DefaultParam implements Serializable{
     public  void setKmerSize(int k){
         kmerSize = k;
         kmerBits = (1 << (kmerSize*2))-1;
+        maximumKmerNum = 1<<(kmerSize*2);
     }
 
 }

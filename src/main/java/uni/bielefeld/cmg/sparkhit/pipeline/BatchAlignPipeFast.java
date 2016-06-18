@@ -37,7 +37,7 @@ import java.util.List;
  */
 
 
-public class BatchAlignPipe implements Serializable{
+public class BatchAlignPipeFast implements Serializable{
     private DefaultParam param;
     private AlignmentParameter pAlign;
 
@@ -62,7 +62,8 @@ public class BatchAlignPipe implements Serializable{
             pAlign.bestNas = (pAlign.alignLength * param.readIdentity) / 100;
             pAlign.bestKmers = pAlign.alignLength - (pAlign.alignLength - pAlign.bestNas) * 4 - 3; // qGram definition, 4 is the gram length
             if (param.readIdentity >= 95) {
-                pAlign.bestPigeon = (pAlign.alignLength - param.kmerSize) / (param.kmerSize - param.kmerOverlap) + 1 - (param.kmerSize / 3 + 1)*(pAlign.alignLength - pAlign.bestNas);
+                pAlign.bestPigeon = pAlign.alignLength / param.kmerSize - 1 - (pAlign.alignLength - pAlign.bestNas);
+                if (pAlign.bestPigeon < 1 ) pAlign.bestPigeon = 1;
             }
         }
 
@@ -165,7 +166,7 @@ public class BatchAlignPipe implements Serializable{
         Qgram qGram;
         List<Qgram> qGramSort = new ArrayList<Qgram>();
         String outputLine = "";
-        reportRepeatHits =1;
+        reportRepeatHits = 1;
 
         int kmerSkip =1; // how to extend kmers, 1bp per extension
         if (rInfo.readSize >= param.skipThreshold) {kmerSkip =2;} // for longer than 1000, 2bps
@@ -186,13 +187,13 @@ public class BatchAlignPipe implements Serializable{
             }
 
             pAlign.kmerHits.clear();
+
             /* merge adjacent blocks */
             mergeCandidateBlocks();
             pAlign.cRefBlockList.clear();
 
             /* initial 4 Gram hash table */
             buildFourGram(rInfo.readSize);
-
             /* loop each blocks and return a qualified qGram */
             for (i=0; i<pAlign.mergeRefBlockList.size();i++){
                 mRefBlock = pAlign.mergeRefBlockList.get(i);
@@ -221,9 +222,8 @@ public class BatchAlignPipe implements Serializable{
 
             Collections.sort(qGramSort, new QgramComparator()); // sort all objects by their propertiy "qGrams"
             trys =0;
-
             for (i=0; i<qGramSort.size();i++){
-                if (reportRepeatHits > param.reportRepeatHits && param.reportRepeatHits != 0) break;
+                if (reportRepeatHits > param.reportRepeatHits && param.reportRepeatHits !=0 ) break;
                 qGram = qGramSort.get(i);
                 mRefBlockLen = qGram.end - qGram.begin;
                 m = BBList.get(qGram.chr).s;
@@ -235,7 +235,6 @@ public class BatchAlignPipe implements Serializable{
                             : (m[k/12] << (l-24)|m[k/12+1]>>(48-l))&3;
                     j++;
                 }
-
 
                 /* banded alignment */
                 int aligned = bandAlignment(qGram, mRefBlockLen, rInfo.readSize);
@@ -284,8 +283,9 @@ public class BatchAlignPipe implements Serializable{
 
         if ((param.chains == 0) || (param.chains == 2)){
             getRevReadKmerHits(rInfo.readSize, kmerSkip);
+
             if (param.readIdentity >= 95) {
-                if (pAlign.kmerHits.size() > pAlign.bestPigeon) {
+                if (pAlign.kmerHits.size() >= pAlign.bestPigeon) {
                     Collections.sort(pAlign.kmerHits);
                     getRefCandidateBlockWithPigeon(rInfo.readSize);
                 }else{
@@ -302,15 +302,15 @@ public class BatchAlignPipe implements Serializable{
                 }
             }
 
-
             pAlign.kmerHits.clear();
+
             /* merge adjacent blocks */
             mergeCandidateBlocks();
             pAlign.cRefBlockList.clear();
 
-
             /* initial 4 Gram hash table */
             buildRevFourGram(rInfo.readSize);
+
             /* loop each blocks and return a qualified qGram */
             for (i=0; i<pAlign.mergeRefBlockList.size();i++){
                 mRefBlock = pAlign.mergeRefBlockList.get(i);
@@ -333,12 +333,14 @@ public class BatchAlignPipe implements Serializable{
                 qGram.end = mRefBlock.end;
                 qGramSort.add(qGram);
             }
+
             pAlign.mergeRefBlockList.clear();
             Collections.sort(qGramSort, new QgramComparator()); // sort all objects by their propertiy "qGrams"
             trys =0;
 
             for (i=0; i<qGramSort.size();i++){
-                if (reportRepeatHits > param.reportRepeatHits && param.reportRepeatHits != 0) break; // report N hits
+                if (reportRepeatHits > param.reportRepeatHits && param.reportRepeatHits !=0){break;}
+
                 qGram = qGramSort.get(i);
                 mRefBlockLen = qGram.end - qGram.begin;
                 m = BBList.get(qGram.chr).s;
@@ -856,6 +858,7 @@ public class BatchAlignPipe implements Serializable{
                     bestAlign = 1;
                 }
 
+                /* tracing back */
                 int n, p;
                 p = (-qGram.bandLeft+1-i > 0) ? -qGram.bandLeft+1-i : 0 ;
                 for (k = l-1, ks=0; k>=p; k--, ks++){

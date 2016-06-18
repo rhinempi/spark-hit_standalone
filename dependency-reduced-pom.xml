@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cmg</groupId>
   <artifactId>SparkHit</artifactId>
-  <version>0.2-STANDALONE</version>
+  <version>0.3-STANDALONE</version>
   <build>
     <plugins>
       <plugin>

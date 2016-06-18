@@ -34,6 +34,7 @@ public class FastqUnitBuffer implements NGSfileUnitBuffer{
     private int unitCount = 1000;
     private int pointerInt = unitCount; // make it bigger than unitCount to initiate the first buffer loading
     private int lineCount = 0;
+    private int unitCountPerKbp = 0;
     private InfoDumper info = new InfoDumper();
     public readInfo[] reads;
     public BufferedReader inputBufferedReader;
@@ -87,7 +88,8 @@ public class FastqUnitBuffer implements NGSfileUnitBuffer{
                 }
             }
 
-            info.readMessage("load " + unitsMark + " fastq read units into buffer");
+            unitCountPerKbp++;
+            info.readMessage("load " + unitCountPerKbp * unitsMark + " fastq read units into buffer");
             info.screenDump();
         } catch (IOException e) {
             e.printStackTrace();

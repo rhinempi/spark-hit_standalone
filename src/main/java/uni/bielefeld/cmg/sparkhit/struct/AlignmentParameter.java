@@ -62,6 +62,8 @@ public class AlignmentParameter implements Serializable{
     public int bestNas;
     public int bestKmers;
 
+    public int bestPigeon;
+
     public int fromFirst;
     public int fromSecond;
     public int endFirst;

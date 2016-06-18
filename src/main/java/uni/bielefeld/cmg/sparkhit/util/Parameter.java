@@ -126,7 +126,7 @@ public class Parameter {
                 .create(UNMASK));
 
         parameter.addOption(OptionBuilder.withArgName("kmer overlap")
-                .hasArg().withDescription("small overlap for long read")
+                .hasArg().withDescription("more overlap, less skip for extract continual k-mer")
                 .create(OVERLAP));
 
         parameter.addOption(OptionBuilder.withArgName("identity threshold")
@@ -214,9 +214,19 @@ public class Parameter {
             if ((value = cl.getOptionValue(KMER_SIZE)) != null){
                 if (Integer.decode(value) >= 8 || Integer.decode(value) <= 12){
                     param.kmerSize = Integer.decode(value);
+                    param.setKmerSize(param.kmerSize);  // re-initiating kmerSize related parameter, like maximumKmerNum
                 }else{
                     throw new RuntimeException("Parameter " + KMER_SIZE +
                             " should be set between 8-12");
+                }
+            }
+
+            if ((value = cl.getOptionValue(OVERLAP)) != null){
+                if (Integer.decode(value) >= 0 || Integer.decode(value) <= param.kmerSize){
+                    param.kmerOverlap = Integer.decode(value);
+                }else{
+                    throw new RuntimeException("Parameter " + OVERLAP +
+                            " should not be bigger than kmer size or smaller than 0");
                 }
             }
 
@@ -254,15 +264,6 @@ public class Parameter {
                 }else{
                     throw new RuntimeException("Parameter " + UNMASK +
                         " should be set as 1 or 0");
-                }
-            }
-
-            if ((value = cl.getOptionValue(OVERLAP)) != null){
-                if (Integer.decode(value) >= 0 || Integer.decode(value) <= param.kmerSize){
-                    param.kmerOverlap = Integer.decode(value);
-                }else{
-                    throw new RuntimeException("Parameter " + OVERLAP +
-                        " should not be bigger than kmer size or smaller than 0");
                 }
             }
 
@@ -320,7 +321,9 @@ public class Parameter {
             if ((value = cl.getOptionValue(INPUT_FASTQ)) != null){
                 param.inputFqPath = value;
             }else{
-                throw new IOException("Input query file not specified.\nUse -help for list of options");
+                help.printHelp();
+                System.exit(0);
+                //throw new IOException("Input query file not specified.\nUse -help for list of options");
             }
 
 			/* not applicable for HDFS and S3 */
@@ -363,6 +366,12 @@ public class Parameter {
 
             param.bestNas = (param.alignLength * param.readIdentity) / 100;
             param.bestKmers = param.alignLength - (param.alignLength - param.bestNas) * 4 - 3;
+            /*
+            if (param.readIdentity >= 94) {
+                param.bestPigeon = param.alignLength / param.kmerSize - 1 - (param.alignLength - param.bestNas);
+                if (param.bestPigeon < 1 ) param.bestPigeon = 1;
+            }
+            */
 
             if (param.bestKmers < (param.kmerSize - 3)){
                 param.bestKmers = param.kmerSize - 3;

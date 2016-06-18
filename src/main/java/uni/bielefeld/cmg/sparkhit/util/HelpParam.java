@@ -62,7 +62,7 @@ public class HelpParam {
 
         final String executable = System.getProperty("executable", "java -jar SparkHit.jar");
         err.println("Name:");
-        err.println("\tSparkHit");
+        err.println("\tSparkHit standalone");
         err.println();
         err.println("Options:");
         formatter.printOptions(new PrintWriter(err, true), 85, parameter, 2, 3); /* print formatted parameters */
